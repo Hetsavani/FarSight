@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import screens from '@/data/screens.json';
 import shell from '@/data/shell.json';
 import leadData from '@/data/leads.json';
+import { useRadarTheme } from './theme';
 
 const paths = {'overview':'/','find-leads':'/find-leads','lead-inbox':'/lead-inbox','research-queue':'/research-queue','outreach':'/outreach','saved-searches':'/saved-searches','sources-and-platforms':'/sources-and-platforms','usage-and-limits':'/usage-and-limits','settings':'/settings'} as const;
 type Page=keyof typeof paths;
@@ -15,7 +16,7 @@ function nodeText(node:DOMNode):string {if(node.type==='text')return node.data;r
 function download(name:string,text:string,type='text/csv'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href);}
 export function pageHead(title:string,description:string){return {meta:[{title:`${title} | Opportunity Radar`},{name:'description',content:description},{property:'og:title',content:`${title} | Opportunity Radar`},{property:'og:description',content:description},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]};}
 export function RadarScreen({page,detail=false}:{page:Page;detail?:boolean}){
- const navigate=useNavigate(); const [theme,setTheme]=useState('dark'); const [query,setQuery]=useState(''); const [status,setStatus]=useState('All'); const [selected,setSelected]=useState('1'); const [drawer,setDrawer]=useState(true);const [empty,setEmpty]=useState(false);const [notice,setNotice]=useState('');const [modal,setModal]=useState('');const [name,setName]=useState('');const [savedNames,setSavedNames]=useState<string[]>([]);const [notes,setNotes]=useState<string[]>([]);const [updated,setUpdated]=useState<Record<string,string>>({});const [paused,setPaused]=useState<string[]>([]);const [toggles,setToggles]=useState<string[]>([]);const [filters,setFilters]=useState<Record<string,string>>({});const [busy,setBusy]=useState(false);const [threshold,setThreshold]=useState(75);
+ const navigate=useNavigate(); const {theme,setTheme}=useRadarTheme(); const [query,setQuery]=useState(''); const [status,setStatus]=useState('All'); const [selected,setSelected]=useState('1'); const [drawer,setDrawer]=useState(true);const [empty,setEmpty]=useState(false);const [notice,setNotice]=useState('');const [modal,setModal]=useState('');const [name,setName]=useState('');const [savedNames,setSavedNames]=useState<string[]>([]);const [notes,setNotes]=useState<string[]>([]);const [updated,setUpdated]=useState<Record<string,string>>({});const [paused,setPaused]=useState<string[]>([]);const [toggles,setToggles]=useState<string[]>([]);const [filters,setFilters]=useState<Record<string,string>>({});const [busy,setBusy]=useState(false);const [threshold,setThreshold]=useState(75);
  const baseId=detail?8:screenIds[page];const id=theme==='light'?(lightIds[baseId]??baseId):baseId;
  const leads=leadData as Record<string,Record<string,string>>;const lead=leads[selected]??leads['1'];
  const alert=(text:string)=>{setNotice(text);window.setTimeout(()=>setNotice(''),4000);};
