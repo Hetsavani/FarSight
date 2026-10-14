@@ -10,33 +10,154 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FindLeadsRouteImport } from './routes/find-leads'
+import { Route as LeadInboxRouteImport } from './routes/lead-inbox'
+import { Route as OutreachRouteImport } from './routes/outreach'
+import { Route as ResearchQueueRouteImport } from './routes/research-queue'
+import { Route as SavedSearchesRouteImport } from './routes/saved-searches'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SourcesAndPlatformsRouteImport } from './routes/sources-and-platforms'
+import { Route as UsageAndLimitsRouteImport } from './routes/usage-and-limits'
+import { Route as LeadsMeridianRouteImport } from './routes/leads.meridian'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FindLeadsRoute = FindLeadsRouteImport.update({
+  id: '/find-leads',
+  path: '/find-leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadInboxRoute = LeadInboxRouteImport.update({
+  id: '/lead-inbox',
+  path: '/lead-inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OutreachRoute = OutreachRouteImport.update({
+  id: '/outreach',
+  path: '/outreach',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchQueueRoute = ResearchQueueRouteImport.update({
+  id: '/research-queue',
+  path: '/research-queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedSearchesRoute = SavedSearchesRouteImport.update({
+  id: '/saved-searches',
+  path: '/saved-searches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SourcesAndPlatformsRoute = SourcesAndPlatformsRouteImport.update({
+  id: '/sources-and-platforms',
+  path: '/sources-and-platforms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsageAndLimitsRoute = UsageAndLimitsRouteImport.update({
+  id: '/usage-and-limits',
+  path: '/usage-and-limits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsMeridianRoute = LeadsMeridianRouteImport.update({
+  id: '/leads/meridian',
+  path: '/leads/meridian',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/find-leads': typeof FindLeadsRoute
+  '/lead-inbox': typeof LeadInboxRoute
+  '/outreach': typeof OutreachRoute
+  '/research-queue': typeof ResearchQueueRoute
+  '/saved-searches': typeof SavedSearchesRoute
+  '/settings': typeof SettingsRoute
+  '/sources-and-platforms': typeof SourcesAndPlatformsRoute
+  '/usage-and-limits': typeof UsageAndLimitsRoute
+  '/leads/meridian': typeof LeadsMeridianRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/find-leads': typeof FindLeadsRoute
+  '/lead-inbox': typeof LeadInboxRoute
+  '/outreach': typeof OutreachRoute
+  '/research-queue': typeof ResearchQueueRoute
+  '/saved-searches': typeof SavedSearchesRoute
+  '/settings': typeof SettingsRoute
+  '/sources-and-platforms': typeof SourcesAndPlatformsRoute
+  '/usage-and-limits': typeof UsageAndLimitsRoute
+  '/leads/meridian': typeof LeadsMeridianRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/find-leads': typeof FindLeadsRoute
+  '/lead-inbox': typeof LeadInboxRoute
+  '/outreach': typeof OutreachRoute
+  '/research-queue': typeof ResearchQueueRoute
+  '/saved-searches': typeof SavedSearchesRoute
+  '/settings': typeof SettingsRoute
+  '/sources-and-platforms': typeof SourcesAndPlatformsRoute
+  '/usage-and-limits': typeof UsageAndLimitsRoute
+  '/leads/meridian': typeof LeadsMeridianRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/find-leads'
+    | '/lead-inbox'
+    | '/outreach'
+    | '/research-queue'
+    | '/saved-searches'
+    | '/settings'
+    | '/sources-and-platforms'
+    | '/usage-and-limits'
+    | '/leads/meridian'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/find-leads'
+    | '/lead-inbox'
+    | '/outreach'
+    | '/research-queue'
+    | '/saved-searches'
+    | '/settings'
+    | '/sources-and-platforms'
+    | '/usage-and-limits'
+    | '/leads/meridian'
+  id:
+    | '__root__'
+    | '/'
+    | '/find-leads'
+    | '/lead-inbox'
+    | '/outreach'
+    | '/research-queue'
+    | '/saved-searches'
+    | '/settings'
+    | '/sources-and-platforms'
+    | '/usage-and-limits'
+    | '/leads/meridian'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FindLeadsRoute: typeof FindLeadsRoute
+  LeadInboxRoute: typeof LeadInboxRoute
+  OutreachRoute: typeof OutreachRoute
+  ResearchQueueRoute: typeof ResearchQueueRoute
+  SavedSearchesRoute: typeof SavedSearchesRoute
+  SettingsRoute: typeof SettingsRoute
+  SourcesAndPlatformsRoute: typeof SourcesAndPlatformsRoute
+  UsageAndLimitsRoute: typeof UsageAndLimitsRoute
+  LeadsMeridianRoute: typeof LeadsMeridianRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +169,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/find-leads': {
+      id: '/find-leads'
+      path: '/find-leads'
+      fullPath: '/find-leads'
+      preLoaderRoute: typeof FindLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lead-inbox': {
+      id: '/lead-inbox'
+      path: '/lead-inbox'
+      fullPath: '/lead-inbox'
+      preLoaderRoute: typeof LeadInboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/outreach': {
+      id: '/outreach'
+      path: '/outreach'
+      fullPath: '/outreach'
+      preLoaderRoute: typeof OutreachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/research-queue': {
+      id: '/research-queue'
+      path: '/research-queue'
+      fullPath: '/research-queue'
+      preLoaderRoute: typeof ResearchQueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved-searches': {
+      id: '/saved-searches'
+      path: '/saved-searches'
+      fullPath: '/saved-searches'
+      preLoaderRoute: typeof SavedSearchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sources-and-platforms': {
+      id: '/sources-and-platforms'
+      path: '/sources-and-platforms'
+      fullPath: '/sources-and-platforms'
+      preLoaderRoute: typeof SourcesAndPlatformsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/usage-and-limits': {
+      id: '/usage-and-limits'
+      path: '/usage-and-limits'
+      fullPath: '/usage-and-limits'
+      preLoaderRoute: typeof UsageAndLimitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads/meridian': {
+      id: '/leads/meridian'
+      path: '/leads/meridian'
+      fullPath: '/leads/meridian'
+      preLoaderRoute: typeof LeadsMeridianRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FindLeadsRoute: FindLeadsRoute,
+  LeadInboxRoute: LeadInboxRoute,
+  OutreachRoute: OutreachRoute,
+  ResearchQueueRoute: ResearchQueueRoute,
+  SavedSearchesRoute: SavedSearchesRoute,
+  SettingsRoute: SettingsRoute,
+  SourcesAndPlatformsRoute: SourcesAndPlatformsRoute,
+  UsageAndLimitsRoute: UsageAndLimitsRoute,
+  LeadsMeridianRoute: LeadsMeridianRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
