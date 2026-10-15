@@ -71,6 +71,15 @@ describe("normalizeProviderResult", () => {
     ).toBeNull();
   });
 
+  it("converts provider RFC-style dates to ISO without inventing dates", () => {
+    expect(
+      normalizeProviderResult(
+        { ...VALID_ITEM, published_date: "Tue, 11 Mar 2025 17:00:00 GMT" },
+        CTX,
+      ).publishedDate,
+    ).toBe("2025-03-11T17:00:00.000Z");
+  });
+
   it("falls back to alternate provider field names and the domain", () => {
     const result = normalizeProviderResult(
       {

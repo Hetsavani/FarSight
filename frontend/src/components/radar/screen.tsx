@@ -11,6 +11,10 @@ import { Button } from "@/components/ui/button";
 import screens from "@/data/screens.json";
 import shell from "@/data/shell.json";
 import leadData from "@/data/leads.json";
+import { collectFindLeadsRequest } from "@/lib/discovery/collect-request";
+import { searchRequestSchema, type SearchResult } from "@/lib/discovery/search-contract";
+import { buildTavilyQuery } from "@/lib/discovery/tavily";
+import { searchLeads } from "@/functions/discovery";
 import { useRadarTheme } from "./theme";
 
 const paths = {
@@ -48,6 +52,12 @@ const screenIds: Record<Page, number> = {
   settings: 4,
 };
 const lightIds: Record<number, number> = { 10: 6, 11: 12, 2: 1, 8: 14 };
+
+type LiveState =
+  | { status: "idle" }
+  | { status: "loading"; query: string }
+  | { status: "done"; results: SearchResult[]; dropped: number; query: string }
+  | { status: "error"; error: string };
 function nodeText(node: DOMNode): string {
   if (node.type === "text") return node.data;
   return "children" in node ? node.children.map((n) => nodeText(n as DOMNode)).join(" ") : "";
@@ -58,6 +68,114 @@ function download(name: string, text: string, type = "text/csv") {
   a.download = name;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+function LiveResultsPanel({ live, calls }: { live: LiveState; calls: number }) {
+  if (live.status === "idle") return null;
+  return (
+    <section
+      className="px-gutter-desktop pb-space-lg"
+      aria-live="polite"
+      aria-label="Live search results"
+    >
+      <div className="rounded-xl bg-surface-container-low border border-outline-variant/30 shadow-sm p-space-lg space-y-space-md">
+        {live.status === "loading" && (
+          <div className="space-y-space-xs">
+            <div className="flex items-center gap-space-xs">
+              <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
+              <span className="font-headline-sm text-headline-sm text-on-surface">
+                Searching live sources…
+              </span>
+            </div>
+            <p className="font-mono-data text-mono-data text-on-surface-variant break-all">
+              {live.query}
+            </p>
+          </div>
+        )}
+        {live.status === "error" && (
+          <div className="space-y-space-xs">
+            <span className="font-headline-sm text-headline-sm text-on-surface">
+              Live search failed
+            </span>
+            <p className="font-body-md text-body-md text-on-surface-variant">{live.error}</p>
+            {/TAVILY_API_KEY/.test(live.error) && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Set TAVILY_API_KEY in frontend/.env on the server (it is git-ignored — never commit
+                it) and restart the dev server.
+              </p>
+            )}
+          </div>
+        )}
+        {live.status === "done" && (
+          <div className="space-y-space-md">
+            <div className="flex flex-wrap items-center gap-space-xs">
+              <span className="font-headline-sm text-headline-sm text-on-surface">
+                Live results · {live.results.length}
+              </span>
+              <span className="font-label-xs text-label-xs px-space-xs py-0.5 rounded-full bg-tertiary/10 text-tertiary border border-tertiary/30">
+                Unverified candidates
+              </span>
+            </div>
+            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+              Live web candidates. The signal class is a search classification, not proof of buying
+              intent — open each source before treating it as a lead.
+            </p>
+            <p className="font-mono-data text-mono-data text-on-surface-variant break-all">
+              Searched: {live.query}
+            </p>
+            {live.dropped > 0 && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                {live.dropped} duplicate or unusable result{live.dropped === 1 ? " was" : "s were"}{" "}
+                skipped.
+              </p>
+            )}
+            {live.results.length === 0 ? (
+              <p className="font-body-md text-body-md text-on-surface-variant">
+                No live candidates found for this configuration. Try broadening markets or services.
+              </p>
+            ) : (
+              <ul className="space-y-space-sm">
+                {live.results.map((result) => (
+                  <li
+                    key={result.url}
+                    className="rounded-lg bg-surface-container-lowest border border-outline-variant/20 p-space-md space-y-1"
+                  >
+                    <a
+                      href={result.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-body-md text-body-md font-medium text-primary hover:underline break-all"
+                    >
+                      {result.title}
+                    </a>
+                    <p className="font-label-sm text-label-sm text-on-surface-variant">
+                      {result.domain} · {result.sourceName} ·{" "}
+                      {result.publishedDate ?? "Publication date unavailable"}
+                    </p>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant">
+                      {result.snippet.length > 0
+                        ? result.snippet
+                        : "No snippet provided by the source."}
+                    </p>
+                    <p className="font-label-xs text-label-xs text-outline">
+                      Searched as{" "}
+                      {result.signal.category === "direct-demand"
+                        ? "direct demand"
+                        : "potential opportunity"}{" "}
+                      · unverified
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="font-label-xs text-label-xs text-outline">
+              Live Tavily calls this session: {calls}. Quota figures elsewhere on this screen are
+              demo numbers, not live usage.
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }
 export function pageHead(title: string, description: string) {
   return {
@@ -90,6 +208,8 @@ export function RadarScreen({ page, detail = false }: { page: Page; detail?: boo
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [threshold, setThreshold] = useState(75);
+  const [live, setLive] = useState<LiveState>({ status: "idle" });
+  const [liveCalls, setLiveCalls] = useState(0);
   const baseId = detail ? 8 : screenIds[page];
   const id = theme === "light" ? (lightIds[baseId] ?? baseId) : baseId;
   const leads = leadData as Record<string, Record<string, string>>;
@@ -119,6 +239,41 @@ export function RadarScreen({ page, detail = false }: { page: Page; detail?: boo
       void navigate({ to: "/lead-inbox" });
     }, 1200);
   };
+  const runLive = async () => {
+    if (busy) return;
+    const scope = document.querySelector(".reference-screen");
+    const parsed = searchRequestSchema.safeParse(collectFindLeadsRequest(scope));
+    if (!parsed.success) {
+      alert("Select at least one market, industry, or service before running a live search.");
+      return;
+    }
+    setBusy(true);
+    setLive({ status: "loading", query: buildTavilyQuery(parsed.data) });
+    alert("Searching live sources…");
+    try {
+      const response = await searchLeads({ data: parsed.data });
+      setLiveCalls((count) => count + 1);
+      setLive({
+        status: "done",
+        results: response.results,
+        dropped: response.dropped,
+        query: response.query,
+      });
+      alert(
+        response.results.length > 0
+          ? `Live search complete: ${response.results.length} unverified candidate${response.results.length === 1 ? "" : "s"} found.`
+          : "Live search complete: no candidates found.",
+      );
+    } catch (error) {
+      setLive({
+        status: "error",
+        error: error instanceof Error ? error.message : "Live search failed unexpectedly.",
+      });
+      alert("Live search failed. Details are shown below the search form.");
+    } finally {
+      setBusy(false);
+    }
+  };
   const act = (event: MouseEvent<HTMLElement>, node: Element, key: string) => {
     const text = nodeText(node);
     const action = node.attribs["data-action"] ?? "";
@@ -131,10 +286,11 @@ export function RadarScreen({ page, detail = false }: { page: Page; detail?: boo
       void navigate({ to: "/find-leads" });
       return;
     }
-    if (
-      /findOpportunitiesBtn/.test(node.attribs["id"] ?? "") ||
-      /Find Opportunities|Run Now|Run All Active|Run Batch/.test(text)
-    ) {
+    if (/findOpportunitiesBtn/.test(node.attribs["id"] ?? "")) {
+      void runLive();
+      return;
+    }
+    if (/Find Opportunities|Run Now|Run All Active|Run Batch/.test(text)) {
       run();
       return;
     }
@@ -297,6 +453,18 @@ export function RadarScreen({ page, detail = false }: { page: Page; detail?: boo
       const text = nodeText(node);
       const children = () => domToReact(node.children as DOMNode[], options);
       if (node.name === "script") return <></>;
+      if (
+        page === "find-leads" &&
+        (node.name === "span" || node.name === "div") &&
+        /Tavily calls/.test(text)
+      ) {
+        return (
+          <span {...attrs}>
+            {children()}{" "}
+            <span className="font-label-xs text-label-xs text-outline">(demo figures)</span>
+          </span>
+        );
+      }
       if (node.name === "img" && node.attribs["alt"] === "Opportunity Radar Emblem")
         return (
           <span
@@ -546,6 +714,7 @@ export function RadarScreen({ page, detail = false }: { page: Page; detail?: boo
             </div>
           )}
         </div>
+        {page === "find-leads" && <LiveResultsPanel live={live} calls={liveCalls} />}
       </div>
       {notice && (
         <div role="status" className="radar-notice">

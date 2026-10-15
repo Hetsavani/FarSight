@@ -112,10 +112,16 @@ export function canonicalizeUrl(url: string): string {
 function normalizeDate(value: unknown): string | null {
   const text = asNonEmptyString(value);
   if (!text) return null;
-  if (!/^\d{4}-\d{2}-\d{2}/.test(text)) return null;
+  if (/^\d{4}-\d{2}-\d{2}/.test(text)) {
+    return Number.isNaN(Date.parse(text)) ? null : text;
+  }
+  // Providers may use non-ISO formats (e.g. Tavily's RFC-style
+  // "Tue, 11 Mar 2025 17:00:00 GMT"). Convert to ISO only when the string
+  // carries an explicit 4-digit year, so vague phrases stay null.
+  if (!/\b(19|20)\d{2}\b/.test(text)) return null;
   const parsed = Date.parse(text);
   if (Number.isNaN(parsed)) return null;
-  return text;
+  return new Date(parsed).toISOString();
 }
 
 /**
