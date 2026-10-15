@@ -79,16 +79,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Opportunity Radar" },
+      { title: "FarSight | Opportunity Radar" },
       { name: "description", content: "Engineering opportunities and buying signal intelligence." },
-      { property: "og:title", content: "Opportunity Radar" },
-      { property: "og:description", content: "Engineering opportunities and buying signal intelligence." },
+      { property: "og:title", content: "FarSight | Opportunity Radar" },
+      {
+        property: "og:description",
+        content: "Engineering opportunities and buying signal intelligence.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -122,7 +131,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <RadarThemeProvider><Outlet /></RadarThemeProvider>
+      <RadarThemeProvider>
+        <Outlet />
+      </RadarThemeProvider>
     </QueryClientProvider>
   );
 }
