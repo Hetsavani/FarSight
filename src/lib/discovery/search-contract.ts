@@ -8,7 +8,7 @@ import { z } from "zod";
  * must conform to these schemas rather than extending them ad hoc.
  *
  * Option codes mirror the values shown on the existing Find Leads reference
- * screen (frontend/src/data/screens.json entry "11"). The recency window and
+ * screen (src/data/screens.json entry "11"). The recency window and
  * "max candidates" presets shown in that screen are deliberately NOT part of
  * this contract: the upcoming search implementation will use a fixed
  * conservative limit, and additional filters are added only when the search

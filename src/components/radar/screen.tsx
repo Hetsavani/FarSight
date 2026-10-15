@@ -99,8 +99,8 @@ function LiveResultsPanel({ live, calls }: { live: LiveState; calls: number }) {
             <p className="font-body-md text-body-md text-on-surface-variant">{live.error}</p>
             {/TAVILY_API_KEY/.test(live.error) && (
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Set TAVILY_API_KEY in frontend/.env on the server (it is git-ignored — never commit
-                it) and restart the dev server.
+                Set TAVILY_API_KEY in .env on the server (it is git-ignored — never commit it) and
+                restart the dev server.
               </p>
             )}
           </div>

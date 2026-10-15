@@ -6,7 +6,7 @@ This spec is grounded in the actual repository. Each section marks **Implemented
 
 ## 1. Product vision
 
-**Implemented:** a demo UI shell for an opportunity-discovery workspace ("FarSight / Opportunity Radar"), with ten navigable routes rendering illustrative reference screens. There is no live discovery, no backend, and no persistence — every screen is explicitly labeled demo/illustrative.
+**Implemented:** a working opportunity-discovery workspace ("FarSight / Opportunity Radar") with ten routes. Find Leads performs a real bounded Tavily search via a server function and shows live results with original source links; the remaining screens render illustrative reference content and there is no persistence — demo content stays explicitly labeled.
 
 **Planned (first priority):** a personal opportunity-discovery system that helps an independent software engineer find **genuine client-acquisition opportunities** — organizations with real, evidenced need for software development and AI implementation services. The first release must be a simple, useful client-finding workflow, not a generic research dashboard or an autonomous-agent platform.
 
@@ -24,7 +24,7 @@ This spec is grounded in the actual repository. Each section marks **Implemented
 - Markets: United States, Canada, United Kingdom, Europe, United Arab Emirates, Australia, New Zealand.
 - Industries/company types: AI and software startups (incl. YC-backed), SaaS businesses, software/AI agencies needing implementation partners or capacity, real estate and property developers, hospitality and hotels, healthcare/medical, restaurants, logistics/supply chain, and other businesses with meaningful software or automation needs.
 
-**Implemented:** these appear only as static filter tiles and six illustrative leads in `frontend/src/data/leads.json` (hospitality, automation studio, property, health, logistics, clean energy). Presence in the demo is not evidence of real budgets or needs.
+**Implemented:** these appear only as static filter tiles and six illustrative leads in `src/data/leads.json` (hospitality, automation studio, property, health, logistics, clean energy). Presence in the demo is not evidence of real budgets or needs.
 
 ## 4. Opportunity and buying-signal model
 
@@ -75,7 +75,7 @@ The initial useful workflow:
 5. Save or reject results.
 6. Revisit saved results.
 
-**Implemented today:** step 1 as static demo filters; a simulated "preview run" (1.2s timeout → navigates to Lead Inbox); step 3 as illustrative rows + drawer + research brief with `observed`/`inferred` copy; step 5 as session-local status flips/notes/saved-search names plus client-side CSV export and clipboard copy. Steps 2 (real), 4 (real URLs), 5-persistence, and 6-persistence are **planned** — no search executes, no data persists (no backend, DB, or localStorage).
+**Implemented today:** step 1 as Find Leads filters; step 2 as one bounded Tavily call per submission (`src/functions/discovery.ts`, key stays server-side); step 3 as live result cards with snippets plus the existing illustrative rows/drawer/brief; step 4 via original-source links on live results; step 5 as session-local status flips/notes/saved-search names plus client-side CSV export and clipboard copy. Save/reject persistence and revisiting saved results remain **planned** — no data persists (no DB).
 
 ## 8. Quality requirements
 
@@ -93,7 +93,7 @@ The initial useful workflow:
 - The initial implementation must be free to operate within available free-tier quotas.
 - Tavily is the currently identified candidate for web search; the user reports access to a free tier of 1,000 credits/month. Treat this as user-provided context, not a guarantee of provider terms or remaining credits. The repo contains **no Tavily integration, key, or client** — the "858 / 1,000 Tavily calls" pill is static demo text. Use Tavily only if the repo confirms it or the implementation task explicitly establishes it.
 - Do not fall back to paid services automatically. Do not add Gemini, Firecrawl, Exa, paid hosting, a paid database, or other billable integrations without explicit approval.
-- Keep the architecture simple: no unnecessary background workers, autonomous agents, or infrastructure. The current app is a single TanStack Start frontend with zero backend — keep it that simple until the MVP workflow requires more.
+- Keep the architecture simple: no unnecessary background workers, autonomous agents, or infrastructure. The current app is a single TanStack Start app with server functions and no separate backend — keep it that simple until the MVP workflow requires more.
 - Never expose API keys in the browser (there are none today; see `AGENTS.md` for the server-side rule).
 
 ## 10. Out of scope for the first iteration

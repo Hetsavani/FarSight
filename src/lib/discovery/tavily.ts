@@ -9,7 +9,7 @@ import {
 /**
  * Tavily-specific helpers. Pure functions only — no network, no secrets.
  * The API key is handled exclusively inside the server function
- * (frontend/src/functions/discovery.ts) and never enters this module.
+ * (src/functions/discovery.ts) and never enters this module.
  *
  * Endpoint reference: POST https://api.tavily.com/search
  * (https://docs.tavily.com/documentation/api-reference/endpoint/search).

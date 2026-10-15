@@ -31,7 +31,7 @@ function readApiKey(): string {
   const key = typeof process !== "undefined" ? process.env["TAVILY_API_KEY"] : undefined;
   if (!key || key.trim().length === 0) {
     throw new Error(
-      "TAVILY_API_KEY is not configured on the server. Add it to frontend/.env (ignored by git, never commit it) and restart the dev server.",
+      "TAVILY_API_KEY is not configured on the server. Add it to .env (ignored by git, never commit it) and restart the dev server.",
     );
   }
   return key.trim();
